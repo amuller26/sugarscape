@@ -81,6 +81,7 @@ class Agent:
         self.spiceMeanIncome = 1
         self.spiceMetabolismModifier = 0
         self.spicePrice = 0
+        self.startingDiseases = 0
         self.sugarMeanIncome = 1
         self.sugarMetabolismModifier = 0
         self.sugarPrice = 0
@@ -181,6 +182,8 @@ class Agent:
         hammingDistance = diseaseInImmuneSystem["distance"]
         # If immune to disease, do not contract it
         if hammingDistance == 0:
+            if self not in disease.immuneAgents:
+                disease.immuneAgents.append(self)
             return
         startIndex = diseaseInImmuneSystem["start"]
         endIndex = diseaseInImmuneSystem["end"]
