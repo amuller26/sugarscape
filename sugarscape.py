@@ -66,6 +66,7 @@ class Sugarscape:
                              "agentTotalMetabolism": 0, "agentCombatDeaths": 0, "agentAgingDeaths": 0, "totalSickAgents": 0}
         self.diseaseStats = {}
         for disease in self.diseases:
+            self.diseaseStats[f"disease{disease.ID}ImmunePercentage"] = 0.0
             self.diseaseStats[f"disease{disease.ID}Incidence"] = 0
             self.diseaseStats[f"disease{disease.ID}Prevalence"] = 0
             self.diseaseStats[f"disease{disease.ID}RValue"] = 0
@@ -210,8 +211,8 @@ class Sugarscape:
                 if agent.startingDiseases >= currStartingDiseases and startingDiseases != [0, 0]:
                     currStartingDiseases += 1
                     break
-                hammingDistance = agent.findNearestHammingDistanceInDisease(newDisease)["distance"]
-                if hammingDistance == 0:
+                agentImmunity = agent.checkDiseaseImmunity(newDisease)
+                if agentImmunity == True:
                     continue
                 agent.catchDisease(newDisease)
                 agent.startingDiseases += 1
@@ -997,14 +998,24 @@ class Sugarscape:
         self.runtimeStats["totalSickAgents"] = totalSickAgents
 
         for disease in self.diseases:
+            immuneAgents = 0
+            if numAgents > 0:
+                for agent in self.agents:
+                    agentImmunity = agent.checkDiseaseImmunity(disease)
+                    if agentImmunity == True:
+                        immuneAgents += 1
+            immunePercentage = 0.0
+            if numAgents > 0:
+                immunePercentage = round(float(immuneAgents / numAgents), 2)
             infectors = len(disease.infectors)
             incidence = disease.infected
             prevalence = self.countInfectedAgents(disease)
-            r = 0
+            r = 0.0
             if infectors > 0:
                 r = round(float(incidence / infectors), 2)
-            self.runtimeStats[f"disease{disease.ID}Incidence"] = incidence       
-            self.runtimeStats[f"disease{disease.ID}Prevalence"] = prevalence     
+            self.runtimeStats[f"disease{disease.ID}ImmunePercentage"] = immunePercentage
+            self.runtimeStats[f"disease{disease.ID}Incidence"] = incidence
+            self.runtimeStats[f"disease{disease.ID}Prevalence"] = prevalence
             self.runtimeStats[f"disease{disease.ID}RValue"] = r
 
     def writeToLog(self):

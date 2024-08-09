@@ -16,7 +16,6 @@ class Disease:
         self.startingInfectedAgents = 0
         self.infectors = []
         self.infected = 0
-        self.immuneAgents = []
 
     def resetRStats(self):
         self.infectors = []

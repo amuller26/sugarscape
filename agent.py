@@ -182,9 +182,8 @@ class Agent:
         hammingDistance = diseaseInImmuneSystem["distance"]
         # If immune to disease, do not contract it
         if hammingDistance == 0:
-            if self not in disease.immuneAgents:
-                disease.immuneAgents.append(self)
             return
+
         startIndex = diseaseInImmuneSystem["start"]
         endIndex = diseaseInImmuneSystem["end"]
         caughtDisease = {"disease": disease, "startIndex": startIndex, "endIndex": endIndex}
@@ -196,6 +195,13 @@ class Agent:
         self.diseases.append(caughtDisease)
         self.updateDiseaseEffects(disease)
         self.findCellsInRange()
+
+    def checkDiseaseImmunity(self, disease):
+        hammingDistance = self.findNearestHammingDistanceInDisease(disease)["distance"]
+        if hammingDistance == 0:
+            return True
+        else:
+            return False
 
     def collectResourcesAtCell(self):
         sugarCollected = self.cell.sugar
