@@ -159,6 +159,11 @@ agentDepressionPercentage: float
     Note: The starting agent population will have this same percentage of depressed agents.
     Default: 0.0
 
+agentDiseaseProtectionChance: [int, int]
+    Sets the initial chance an agent can get infected by another agent.
+    Note: a value of 0 mean no protection, while a value of 10 means complete protection
+    Default: [0, 0]
+
 agentFemaleInfertilityAge: [int, int]
     Set the timestep age at which female agents become infertile.
     Default: [0, 0]

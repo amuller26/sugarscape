@@ -548,6 +548,7 @@ class Sugarscape:
         movementMode = configs["agentMovementMode"]
         neighborhoodMode = configs["neighborhoodMode"]
         visionMode = configs["agentVisionMode"]
+        diseaseProtectionChance = configs["agentDiseaseProtectionChance"]
 
         numDepressedAgents = int(math.ceil(numAgents * configs["agentDepressionPercentage"]))
         depressionFactors = [1 for i in range(numDepressedAgents)] + [0 for i in range(numAgents - numDepressedAgents)]
@@ -577,7 +578,8 @@ class Sugarscape:
                           "tradeFactor": {"endowments": [], "curr": tradeFactor[0], "min": tradeFactor[0], "max": tradeFactor[1]},
                           "vision": {"endowments": [], "curr": vision[0], "min": vision[0], "max": vision[1]},
                           "universalSpice": {"endowments": [], "curr": universalSpice[0], "min": universalSpice[0], "max": universalSugar[1]},
-                          "universalSugar": {"endowments": [], "curr": universalSugar[0], "min": universalSugar[0], "max": universalSugar[1]}
+                          "universalSugar": {"endowments": [], "curr": universalSugar[0], "min": universalSugar[0], "max": universalSugar[1]},
+                          "diseaseProtectionChance": {"endowments": [], "curr": diseaseProtectionChance[0], "min": diseaseProtectionChance[0], "max": diseaseProtectionChance[1]}
                           }
 
         if self.agentConfigHashes == None:
@@ -1284,6 +1286,7 @@ if __name__ == "__main__":
                      "agentDecisionModelLookaheadFactor": [0],
                      "agentDecisionModelTribalFactor": [-1, -1],
                      "agentDepressionPercentage": 0,
+                     "agentDiseaseProtectionChance": [0, 0],
                      "agentFemaleInfertilityAge": [0, 0],
                      "agentFemaleFertilityAge": [0, 0],
                      "agentFertilityFactor": [0, 0],

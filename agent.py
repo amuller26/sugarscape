@@ -18,6 +18,7 @@ class Agent:
         self.decisionModelLookaheadFactor = configuration["decisionModelLookaheadFactor"]
         self.decisionModelTribalFactor = configuration["decisionModelTribalFactor"]
         self.depressionFactor = configuration["depressionFactor"]
+        self.diseaseProtectionChance = configuration["diseaseProtectionChance"]
         self.fertilityAge = configuration["fertilityAge"]
         self.fertilityFactor = configuration["fertilityFactor"]
         self.immuneSystem = configuration["immuneSystem"]
@@ -172,18 +173,23 @@ class Agent:
             return False
 
     def catchDisease(self, disease, infector=None):
+        if self.diseaseProtectionChance == 10:
+            return
         diseaseID = disease.ID
         for currDisease in self.diseases:
             currDiseaseID = currDisease["disease"].ID
             # If currently sick with this disease, do not contract it again
             if diseaseID == currDiseaseID:
                 return
+        # Random number determines if agent gets sick or not
+        randomInfectionRate = random.randint(1,10)
+        if randomInfectionRate <= self.diseaseProtectionChance and self.diseaseProtectionChance > 0:
+            return
         diseaseInImmuneSystem = self.findNearestHammingDistanceInDisease(disease)
         hammingDistance = diseaseInImmuneSystem["distance"]
         # If immune to disease, do not contract it
         if hammingDistance == 0:
             return
-
         startIndex = diseaseInImmuneSystem["start"]
         endIndex = diseaseInImmuneSystem["end"]
         caughtDisease = {"disease": disease, "startIndex": startIndex, "endIndex": endIndex}
@@ -192,6 +198,9 @@ class Agent:
             if infector not in disease.infectors:
                 disease.infectors.append(infector.ID)
         disease.infected += 1
+        self.diseaseProtectionChance += 1
+        if self.diseaseProtectionChance > 10:
+            self.diseaseProtectionChance = 10
         self.diseases.append(caughtDisease)
         self.updateDiseaseEffects(disease)
         self.findCellsInRange()
@@ -717,7 +726,6 @@ class Agent:
         parentEndowments = {
         "aggressionFactor": [self.aggressionFactor, mate.aggressionFactor],
         "baseInterestRate": [self.baseInterestRate, mate.baseInterestRate],
-        "depressionFactor": [self.depressionFactor, mate.depressionFactor],
         "fertilityAge": [self.fertilityAge, mate.fertilityAge],
         "fertilityFactor": [self.fertilityFactor, mate.fertilityFactor],
         "infertilityAge": [self.infertilityAge, mate.infertilityAge],

@@ -19,6 +19,7 @@
         "agentDecisionModelLookaheadFactor": 0,
         "agentDecisionModelTribalFactor": [-1, -1],
         "agentDepressionPercentage": 0,
+        "agentDiseaseProtectionChance": [0, 10],
         "agentFemaleInfertilityAge": [40, 50],
         "agentFemaleFertilityAge": [12, 15],
         "agentFertilityFactor": [1, 1],
