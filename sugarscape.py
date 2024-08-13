@@ -108,12 +108,6 @@ class Sugarscape:
                     self.environment.findCell(i, j).maxSugar = cellMaxCapacity
                     self.environment.findCell(i, j).sugar = cellMaxCapacity
 
-    def checkActiveDiseases(self):
-        for agent in self.agents:
-            if len(agent.diseases) > 0:
-                return True
-        return False
-
     def configureAgents(self, numAgents):
         if self.environment == None:
             return
