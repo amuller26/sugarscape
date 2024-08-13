@@ -173,7 +173,7 @@ class Agent:
             return False
 
     def catchDisease(self, disease, infector=None):
-        if self.diseaseProtectionChance == 10:
+        if self.diseaseProtectionChance == 10 and infector != None:
             return
         diseaseID = disease.ID
         for currDisease in self.diseases:
@@ -182,9 +182,10 @@ class Agent:
             if diseaseID == currDiseaseID:
                 return
         # Random number determines if agent gets sick or not
-        randomInfectionRate = random.randint(1,10)
-        if randomInfectionRate <= self.diseaseProtectionChance and self.diseaseProtectionChance > 0:
-            return
+        if infector != None:
+            randomInfectionRate = random.randint(1,10)
+            if randomInfectionRate <= self.diseaseProtectionChance and self.diseaseProtectionChance > 0:
+                return
         diseaseInImmuneSystem = self.findNearestHammingDistanceInDisease(disease)
         hammingDistance = diseaseInImmuneSystem["distance"]
         # If immune to disease, do not contract it
