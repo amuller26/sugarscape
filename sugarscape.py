@@ -209,11 +209,12 @@ class Sugarscape:
                 if agentImmunity == True:
                     continue
                 agent.catchDisease(newDisease)
-                agent.startingDiseases += 1
-                newDisease.startingInfectedAgents += 1
-                if startingDiseases == [0, 0]:
-                    diseases.remove(newDisease)
-                    break
+                if len(agent.diseases) > 0:
+                    agent.startingDiseases += 1
+                    newDisease.startingInfectedAgents += 1
+                    if startingDiseases == [0, 0]:
+                        diseases.remove(newDisease)
+                        break
             if currStartingDiseases > maxStartingDiseases:
                 currStartingDiseases = minStartingDiseases
         if startingDiseases == [0, 0] and self.timestep == self.configuration["diseaseStartTimeframe"][1] and len(diseases) > 0:

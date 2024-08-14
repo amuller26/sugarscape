@@ -173,7 +173,7 @@ class Agent:
             return False
 
     def catchDisease(self, disease, infector=None):
-        if self.diseaseProtectionChance == 10 and infector != None:
+        if self.diseaseProtectionChance == 10:
             return
         diseaseID = disease.ID
         for currDisease in self.diseases:
