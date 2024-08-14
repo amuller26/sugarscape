@@ -1149,6 +1149,11 @@ def verifyConfiguration(configuration):
             print(f"Cannot have agent maximum tribal factor of {configuration['agentDecisionModelTribalFactor'][1]}. Setting agent maximum tribal factor to 1.0.")
         configuration["agentDecisionModelTribalFactor"][1] = 1
 
+    if configuration["agentDiseaseProtectionChance"][1] > 10:
+        if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+            print(f"Cannot have agent maximum disease protection chance of {configuration['agentDiseaseProtectionChance'][1]}. Setting agent maximum disease protection chance to 10.")
+        configuration["agentDiseaseProtectionChance"][1] = 10
+
     if configuration["agentTagStringLength"] < 0:
         if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
             print(f"Cannot have a negative agent tag string length. Setting agent tag string length to 0.")

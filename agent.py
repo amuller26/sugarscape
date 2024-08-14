@@ -607,6 +607,14 @@ class Agent:
     def findAggression(self):
         return max(0, self.aggressionFactor + self.aggressionFactorModifier)
 
+    def isPreyInfected(self, prey):
+        if prey == None:
+            return True
+        if len(prey.diseases) > 0 and len(self.diseases) == 0:
+            return False
+        if len(self.diseases) > 0 and len(prey.diseases) == 0:
+            return False
+
     def findBestCell(self):
         self.findNeighborhood()
         if len(self.cellsInRange) == 0:
@@ -627,6 +635,8 @@ class Agent:
             # Avoid attacking agents ineligible to attack
             prey = cell.agent
             if cell.isOccupied() and self.isNeighborValidPrey(prey) == False:
+                continue
+            if self.isPreyInfected(prey) == False:
                 continue
             preyTribe = prey.tribe if prey != None else "empty"
             preySugar = prey.sugar if prey != None else 0
