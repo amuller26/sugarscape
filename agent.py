@@ -60,6 +60,7 @@ class Agent:
         self.conflictHappiness = 0
         self.depressed = False
         self.diseases = []
+        self.diseaseDeath = False
         self.familyHappiness = 0
         self.fertile = False
         self.fertilityFactorModifier = 0
@@ -257,6 +258,8 @@ class Agent:
     def doDeath(self, causeOfDeath):
         self.alive = False
         self.causeOfDeath = causeOfDeath
+        if len(self.diseases) > 0:
+            self.diseaseDeath = True
         self.resetCell()
         self.doInheritance()
 
