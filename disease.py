@@ -11,6 +11,7 @@ class Disease:
         self.fertilityPenalty = configuration["fertilityPenalty"]
         self.aggressionPenalty = configuration["aggressionPenalty"]
         self.startTimestep = configuration["startTimestep"]
+        self.transmissionChance = configuration["transmissionChance"]
         self.tags = configuration["tags"]
         self.configuration = configuration
         self.startingInfectedAgents = 0

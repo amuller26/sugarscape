@@ -398,6 +398,7 @@ class Sugarscape:
         aggressionPenalty = configs["diseaseAggressionPenalty"]
         tagLengths = configs["diseaseTagStringLength"]
         startTimeframe = configs["diseaseStartTimeframe"]
+        transmissionChance = configs["diseaseTransmissionChance"]
 
         minSugarMetabolismPenalty = sugarMetabolismPenalty[0]
         minSpiceMetabolismPenalty = spiceMetabolismPenalty[0]
@@ -407,6 +408,7 @@ class Sugarscape:
         minAggressionPenalty = aggressionPenalty[0]
         minTagLength = tagLengths[0]
         minStartTimeframe = startTimeframe[0]
+        minTransmissionChance = transmissionChance[0]
 
         maxSugarMetabolismPenalty = sugarMetabolismPenalty[1]
         maxSpiceMetabolismPenalty = spiceMetabolismPenalty[1]
@@ -416,6 +418,7 @@ class Sugarscape:
         maxAggressionPenalty = aggressionPenalty[1]
         maxTagLength = tagLengths[1]
         maxStartTimeframe = startTimeframe[1]
+        maxTransmissionChance = transmissionChance[1]
 
         endowments = []
         sugarMetabolismPenalties = []
@@ -426,6 +429,7 @@ class Sugarscape:
         aggressionPenalties = []
         diseaseTags = []
         startTimesteps = []
+        transmissionChances = []
 
         currSugarMetabolismPenalty = minSugarMetabolismPenalty
         currSpiceMetabolismPenalty = minSpiceMetabolismPenalty
@@ -435,6 +439,7 @@ class Sugarscape:
         currAggressionPenalty = minAggressionPenalty
         currTagLength = minTagLength
         currStartTimestep = minStartTimeframe
+        currTransmissionChance = minTransmissionChance
 
         for i in range(numDiseases):
             sugarMetabolismPenalties.append(currSugarMetabolismPenalty)
@@ -445,6 +450,7 @@ class Sugarscape:
             aggressionPenalties.append(currAggressionPenalty)
             diseaseTags.append([random.randrange(2) for i in range(currTagLength)])
             startTimesteps.append(currStartTimestep)
+            transmissionChances.append(currTransmissionChance)
 
             currSugarMetabolismPenalty += 1
             currSpiceMetabolismPenalty += 1
@@ -454,6 +460,7 @@ class Sugarscape:
             currAggressionPenalty += 1
             currTagLength += 1
             currStartTimestep += 1
+            currTransmissionChance += 1
 
             if currSugarMetabolismPenalty > maxSugarMetabolismPenalty:
                 currSugarMetabolismPenalty = minSugarMetabolismPenalty
@@ -471,6 +478,8 @@ class Sugarscape:
                 currTagLength = minTagLength
             if currStartTimestep > maxStartTimeframe:
                 currStartTimestep = minStartTimeframe
+            if currTransmissionChance > maxTransmissionChance:
+                currTransmissionChance = minTransmissionChance
 
         randomDiseaseEndowment = {"sugarMetabolismPenalties": sugarMetabolismPenalties,
                      "spiceMetabolismPenalties": spiceMetabolismPenalties,
@@ -479,7 +488,8 @@ class Sugarscape:
                      "fertilityPenalties": fertilityPenalties,
                      "aggressionPenalties": aggressionPenalties,
                      "diseaseTags": diseaseTags,
-                     "startTimesteps": startTimesteps}
+                     "startTimesteps": startTimesteps,
+                     "transmissionChances": transmissionChances}
 
         # Map configuration to a random number via hash to make random number generation independent of iteration order
         if (self.diseaseConfigHashes == None):
@@ -503,7 +513,8 @@ class Sugarscape:
                                 "spiceMetabolismPenalty": spiceMetabolismPenalties.pop(),
                                 "tags": diseaseTags.pop(),
                                 "visionPenalty": visionPenalties.pop(),
-                                "startTimestep": startTimesteps.pop()}
+                                "startTimestep": startTimesteps.pop(),
+                                "transmissionChance": transmissionChances.pop()}
             endowments.append(diseaseEndowment)
         return endowments
 
@@ -1326,6 +1337,7 @@ if __name__ == "__main__":
                      "diseaseStartTimeframe": [0, 0],
                      "diseaseSugarMetabolismPenalty": [0, 0],
                      "diseaseTagStringLength": [0, 0],
+                     "diseaseTransmissionChance": [0, 0],
                      "diseaseVisionPenalty": [0, 0],
                      "environmentEquator": -1,
                      "environmentHeight": 50,

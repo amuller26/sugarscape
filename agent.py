@@ -59,6 +59,7 @@ class Agent:
         self.childEndowmentHashes = None
         self.conflictHappiness = 0
         self.depressed = False
+        self.diseaseTransmissionChance = 0
         self.diseases = []
         self.diseaseDeath = False
         self.familyHappiness = 0
@@ -182,16 +183,16 @@ class Agent:
             # If currently sick with this disease, do not contract it again
             if diseaseID == currDiseaseID:
                 return
-        # Random number determines if agent gets sick or not
-        if infector != None:
-            randomInfectionRate = random.randint(1,10)
-            if randomInfectionRate <= self.diseaseProtectionChance and self.diseaseProtectionChance > 0:
-                return
         diseaseInImmuneSystem = self.findNearestHammingDistanceInDisease(disease)
         hammingDistance = diseaseInImmuneSystem["distance"]
         # If immune to disease, do not contract it
         if hammingDistance == 0:
             return
+        # Random number determines if agent gets sick or not
+        if infector != None:
+            randomInfectionRate = random.randint(1,10)
+            if randomInfectionRate <= self.diseaseProtectionChance and self.diseaseProtectionChance > 0:
+                return
         startIndex = diseaseInImmuneSystem["start"]
         endIndex = diseaseInImmuneSystem["end"]
         caughtDisease = {"disease": disease, "startIndex": startIndex, "endIndex": endIndex}
@@ -201,6 +202,9 @@ class Agent:
                 disease.infectors.append(infector.ID)
         disease.infected += 1
         self.diseaseProtectionChance += 1
+        self.diseaseTransmissionChance += disease.transmissionChance
+        if self.diseaseTransmissionChance > 10:
+            self.diseaseTransmissionChance = 10
         if self.diseaseProtectionChance > 10:
             self.diseaseProtectionChance = 10
         self.diseases.append(caughtDisease)
@@ -295,7 +299,9 @@ class Agent:
                 neighbors.append(neighbor)
         random.shuffle(neighbors)
         for neighbor in neighbors:
-            neighbor.catchDisease(self.diseases[random.randrange(diseaseCount)]["disease"], self)
+            randomTransmissionRate = random.randint(1, 10)
+            if randomTransmissionRate <= self.diseaseTransmissionChance:
+                neighbor.catchDisease(self.diseases[random.randrange(diseaseCount)]["disease"], self)
 
     def doInheritance(self):
         if self.inheritancePolicy == "none":
