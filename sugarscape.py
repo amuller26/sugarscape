@@ -390,106 +390,116 @@ class Sugarscape:
 
     def randomizeDiseaseEndowments(self, numDiseases):
         configs = self.configuration
-        sugarMetabolismPenalty = configs["diseaseSugarMetabolismPenalty"]
-        spiceMetabolismPenalty = configs["diseaseSpiceMetabolismPenalty"]
-        movementPenalty = configs["diseaseMovementPenalty"]
-        visionPenalty = configs["diseaseVisionPenalty"]
-        fertilityPenalty = configs["diseaseFertilityPenalty"]
         aggressionPenalty = configs["diseaseAggressionPenalty"]
-        tagLengths = configs["diseaseTagStringLength"]
+        fertilityPenalty = configs["diseaseFertilityPenalty"]
+        incubationPeriod = configs["diseaseIncubationPeriod"]
+        movementPenalty = configs["diseaseMovementPenalty"]
+        spiceMetabolismPenalty = configs["diseaseSpiceMetabolismPenalty"]
         startTimeframe = configs["diseaseStartTimeframe"]
+        sugarMetabolismPenalty = configs["diseaseSugarMetabolismPenalty"]
+        tagLengths = configs["diseaseTagStringLength"]
         transmissionChance = configs["diseaseTransmissionChance"]
+        visionPenalty = configs["diseaseVisionPenalty"]
 
-        minSugarMetabolismPenalty = sugarMetabolismPenalty[0]
-        minSpiceMetabolismPenalty = spiceMetabolismPenalty[0]
-        minMovementPenalty = movementPenalty[0]
-        minVisionPenalty = visionPenalty[0]
-        minFertilityPenalty = fertilityPenalty[0]
         minAggressionPenalty = aggressionPenalty[0]
-        minTagLength = tagLengths[0]
+        minFertilityPenalty = fertilityPenalty[0]
+        minIncubationPeriod = incubationPeriod[0]
+        minMovementPenalty = movementPenalty[0]
+        minSpiceMetabolismPenalty = spiceMetabolismPenalty[0]
         minStartTimeframe = startTimeframe[0]
+        minSugarMetabolismPenalty = sugarMetabolismPenalty[0]
+        minTagLength = tagLengths[0]
         minTransmissionChance = transmissionChance[0]
+        minVisionPenalty = visionPenalty[0]
 
-        maxSugarMetabolismPenalty = sugarMetabolismPenalty[1]
-        maxSpiceMetabolismPenalty = spiceMetabolismPenalty[1]
-        maxMovementPenalty = movementPenalty[1]
-        maxVisionPenalty = visionPenalty[1]
-        maxFertilityPenalty = fertilityPenalty[1]
         maxAggressionPenalty = aggressionPenalty[1]
-        maxTagLength = tagLengths[1]
+        maxFertilityPenalty = fertilityPenalty[1]
+        maxIncubationPeriod = incubationPeriod[1]
+        maxMovementPenalty = movementPenalty[1]
+        maxSpiceMetabolismPenalty = spiceMetabolismPenalty[1]
         maxStartTimeframe = startTimeframe[1]
+        maxSugarMetabolismPenalty = sugarMetabolismPenalty[1]
+        maxTagLength = tagLengths[1]
         maxTransmissionChance = transmissionChance[1]
+        maxVisionPenalty = visionPenalty[1]
 
-        endowments = []
-        sugarMetabolismPenalties = []
-        spiceMetabolismPenalties = []
-        movementPenalties = []
-        visionPenalties = []
-        fertilityPenalties = []
         aggressionPenalties = []
         diseaseTags = []
+        endowments = []
+        fertilityPenalties = []
+        incubationPeriods = []
+        movementPenalties = []
+        spiceMetabolismPenalties = []
         startTimesteps = []
+        sugarMetabolismPenalties = []
         transmissionChances = []
+        visionPenalties = []
 
-        currSugarMetabolismPenalty = minSugarMetabolismPenalty
-        currSpiceMetabolismPenalty = minSpiceMetabolismPenalty
-        currMovementPenalty = minMovementPenalty
-        currVisionPenalty = minVisionPenalty
-        currFertilityPenalty = minFertilityPenalty
         currAggressionPenalty = minAggressionPenalty
-        currTagLength = minTagLength
+        currFertilityPenalty = minFertilityPenalty
+        currIncubationPeriod = minIncubationPeriod
+        currMovementPenalty = minMovementPenalty
+        currSpiceMetabolismPenalty = minSpiceMetabolismPenalty
         currStartTimestep = minStartTimeframe
+        currSugarMetabolismPenalty = minSugarMetabolismPenalty
+        currTagLength = minTagLength
         currTransmissionChance = minTransmissionChance
+        currVisionPenalty = minVisionPenalty
 
         for i in range(numDiseases):
-            sugarMetabolismPenalties.append(currSugarMetabolismPenalty)
-            spiceMetabolismPenalties.append(currSpiceMetabolismPenalty)
-            movementPenalties.append(currMovementPenalty)
-            visionPenalties.append(currVisionPenalty)
-            fertilityPenalties.append(currFertilityPenalty)
             aggressionPenalties.append(currAggressionPenalty)
             diseaseTags.append([random.randrange(2) for i in range(currTagLength)])
+            fertilityPenalties.append(currFertilityPenalty)
+            incubationPeriods.append(currIncubationPeriod)
+            movementPenalties.append(currMovementPenalty)
+            spiceMetabolismPenalties.append(currSpiceMetabolismPenalty)
             startTimesteps.append(currStartTimestep)
+            sugarMetabolismPenalties.append(currSugarMetabolismPenalty)
             transmissionChances.append(currTransmissionChance)
+            visionPenalties.append(currVisionPenalty)
 
-            currSugarMetabolismPenalty += 1
-            currSpiceMetabolismPenalty += 1
-            currMovementPenalty += 1
-            currVisionPenalty += 1
-            currFertilityPenalty += 1
             currAggressionPenalty += 1
-            currTagLength += 1
+            currFertilityPenalty += 1
+            currIncubationPeriod += 1
+            currMovementPenalty += 1
+            currSpiceMetabolismPenalty += 1
             currStartTimestep += 1
+            currSugarMetabolismPenalty += 1
+            currTagLength += 1
             currTransmissionChance += 1
+            currVisionPenalty += 1
 
-            if currSugarMetabolismPenalty > maxSugarMetabolismPenalty:
-                currSugarMetabolismPenalty = minSugarMetabolismPenalty
-            if currSpiceMetabolismPenalty > maxSpiceMetabolismPenalty:
-                currSpiceMetabolismPenalty = minSpiceMetabolismPenalty
-            if currMovementPenalty > maxMovementPenalty:
-                currMovementPenalty = minMovementPenalty
-            if currVisionPenalty > maxVisionPenalty:
-                currVisionPenalty = minVisionPenalty
-            if currFertilityPenalty > maxFertilityPenalty:
-                currFertilityPenalty = minFertilityPenalty
             if currAggressionPenalty > maxAggressionPenalty:
                 currAggressionPenalty = minAggressionPenalty
-            if currTagLength > maxTagLength:
-                currTagLength = minTagLength
+            if currFertilityPenalty > maxFertilityPenalty:
+                currFertilityPenalty = minFertilityPenalty
+            if currIncubationPeriod > maxIncubationPeriod:
+                currIncubationPeriod = minIncubationPeriod
+            if currMovementPenalty > maxMovementPenalty:
+                currMovementPenalty = minMovementPenalty
+            if currSpiceMetabolismPenalty > maxSpiceMetabolismPenalty:
+                currSpiceMetabolismPenalty = minSpiceMetabolismPenalty
             if currStartTimestep > maxStartTimeframe:
                 currStartTimestep = minStartTimeframe
+            if currSugarMetabolismPenalty > maxSugarMetabolismPenalty:
+                currSugarMetabolismPenalty = minSugarMetabolismPenalty
+            if currTagLength > maxTagLength:
+                currTagLength = minTagLength
             if currTransmissionChance > maxTransmissionChance:
                 currTransmissionChance = minTransmissionChance
+            if currVisionPenalty > maxVisionPenalty:
+                currVisionPenalty = minVisionPenalty
 
-        randomDiseaseEndowment = {"sugarMetabolismPenalties": sugarMetabolismPenalties,
-                     "spiceMetabolismPenalties": spiceMetabolismPenalties,
-                     "movementPenalties": movementPenalties,
-                     "visionPenalties": visionPenalties,
-                     "fertilityPenalties": fertilityPenalties,
-                     "aggressionPenalties": aggressionPenalties,
+        randomDiseaseEndowment = {"aggressionPenalties": aggressionPenalties,
                      "diseaseTags": diseaseTags,
+                     "fertilityPenalties": fertilityPenalties,
+                     "incubationPeriods": incubationPeriods,
+                     "movementPenalties": movementPenalties,
+                     "spiceMetabolismPenalties": spiceMetabolismPenalties,
                      "startTimesteps": startTimesteps,
-                     "transmissionChances": transmissionChances}
+                     "sugarMetabolismPenalties": sugarMetabolismPenalties,
+                     "transmissionChances": transmissionChances,
+                     "visionPenalties": visionPenalties}
 
         # Map configuration to a random number via hash to make random number generation independent of iteration order
         if (self.diseaseConfigHashes == None):
@@ -508,13 +518,14 @@ class Sugarscape:
         for i in range(numDiseases):
             diseaseEndowment = {"aggressionPenalty": aggressionPenalties.pop(),
                                 "fertilityPenalty": fertilityPenalties.pop(),
+                                "incubationPeriod": incubationPeriods.pop(),
                                 "movementPenalty": movementPenalties.pop(),
                                 "sugarMetabolismPenalty": sugarMetabolismPenalties.pop(),
+                                "startTimestep": startTimesteps.pop(),
                                 "spiceMetabolismPenalty": spiceMetabolismPenalties.pop(),
                                 "tags": diseaseTags.pop(),
-                                "visionPenalty": visionPenalties.pop(),
-                                "startTimestep": startTimesteps.pop(),
-                                "transmissionChance": transmissionChances.pop()}
+                                "transmissionChance": transmissionChances.pop(),
+                                "visionPenalty": visionPenalties.pop()}
             endowments.append(diseaseEndowment)
         return endowments
 
@@ -1332,6 +1343,7 @@ if __name__ == "__main__":
                      "debugMode": ["none"],
                      "diseaseAggressionPenalty": [0, 0],
                      "diseaseFertilityPenalty": [0, 0],
+                     "diseaseIncubationPeriod": [0, 0],
                      "diseaseMovementPenalty": [0, 0],
                      "diseaseSpiceMetabolismPenalty": [0, 0],
                      "diseaseStartTimeframe": [0, 0],

@@ -4,23 +4,25 @@ import random
 class Disease:
     def __init__(self, diseaseID, configuration):
         self.ID = diseaseID
-        self.sugarMetabolismPenalty = configuration["sugarMetabolismPenalty"]
-        self.spiceMetabolismPenalty = configuration["spiceMetabolismPenalty"]
-        self.visionPenalty = configuration["visionPenalty"]
-        self.movementPenalty = configuration["movementPenalty"]
-        self.fertilityPenalty = configuration["fertilityPenalty"]
-        self.aggressionPenalty = configuration["aggressionPenalty"]
-        self.startTimestep = configuration["startTimestep"]
-        self.transmissionChance = configuration["transmissionChance"]
-        self.tags = configuration["tags"]
         self.configuration = configuration
-        self.startingInfectedAgents = 0
-        self.infectors = []
+        self.aggressionPenalty = configuration["aggressionPenalty"]
+        self.fertilityPenalty = configuration["fertilityPenalty"]
+        self.incubationPeriod = configuration["incubationPeriod"]
+        self.movementPenalty = configuration["movementPenalty"]
+        self.spiceMetabolismPenalty = configuration["spiceMetabolismPenalty"]
+        self.startTimestep = configuration["startTimestep"]
+        self.sugarMetabolismPenalty = configuration["sugarMetabolismPenalty"]
+        self.tags = configuration["tags"]
+        self.transmissionChance = configuration["transmissionChance"]
+        self.visionPenalty = configuration["visionPenalty"]
+
         self.infected = 0
+        self.infectors = []
+        self.startingInfectedAgents = 0
 
     def resetRStats(self):
-        self.infectors = []
         self.infected = 0
+        self.infectors = []
 
     def __str__(self):
         return f"{self.ID}"

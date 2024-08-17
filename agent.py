@@ -188,10 +188,13 @@ class Agent:
         # If immune to disease, do not contract it
         if hammingDistance == 0:
             return
+        randomTransmissionRate = random.randint(1, 10)
+        if randomTransmissionRate > disease.transmissionChance:
+            return
         # Random number determines if agent gets sick or not
         if infector != None:
-            randomInfectionRate = random.randint(1,10)
-            if randomInfectionRate <= self.diseaseProtectionChance and self.diseaseProtectionChance > 0:
+            randomProtectionRate = random.randint(1,10)
+            if randomProtectionRate <= self.diseaseProtectionChance and self.diseaseProtectionChance > 0:
                 return
         startIndex = diseaseInImmuneSystem["start"]
         endIndex = diseaseInImmuneSystem["end"]
@@ -299,9 +302,7 @@ class Agent:
                 neighbors.append(neighbor)
         random.shuffle(neighbors)
         for neighbor in neighbors:
-            randomTransmissionRate = random.randint(1, 10)
-            if randomTransmissionRate <= self.diseaseTransmissionChance:
-                neighbor.catchDisease(self.diseases[random.randrange(diseaseCount)]["disease"], self)
+            neighbor.catchDisease(self.diseases[random.randrange(diseaseCount)]["disease"], self)
 
     def doInheritance(self):
         if self.inheritancePolicy == "none":
