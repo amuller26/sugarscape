@@ -52,7 +52,7 @@
         "debugMode": ["none"],
         "diseaseAggressionPenalty": [-1, 1],
         "diseaseFertilityPenalty": [-1, 1],
-        "diseaseIncubationPeriod": [0,4],
+        "diseaseIncubationPeriod": [0,5],
         "diseaseMovementPenalty": [0, 0],
         "diseaseSpiceMetabolismPenalty": [1, 3],
         "diseaseSugarMetabolismPenalty": [1, 3],

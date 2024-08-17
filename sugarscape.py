@@ -209,7 +209,8 @@ class Sugarscape:
                 if agentImmunity == True:
                     continue
                 agent.catchDisease(newDisease)
-                if len(agent.diseases) > 0:
+                if agent.isSick():
+                    agent.showSymptoms()
                     agent.startingDiseases += 1
                     newDisease.startingInfectedAgents += 1
                     if startingDiseases == [0, 0]:
@@ -244,7 +245,7 @@ class Sugarscape:
     def countInfectedAgents(self, disease):
         totalInfected = 0
         for agent in self.agents:
-            for agentDisease in agent.diseases:
+            for agentDisease in agent.symptomaticDiseases:
                 if disease == agentDisease["disease"]:
                     totalInfected += 1
         return totalInfected

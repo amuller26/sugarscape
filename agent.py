@@ -62,6 +62,9 @@ class Agent:
         self.diseaseTransmissionChance = 0
         self.diseases = []
         self.diseaseDeath = False
+        self.symptomaticDiseases = []
+        self.asymptomaticDiseases = []
+        self.diseaseTransmissionChance = 0
         self.familyHappiness = 0
         self.fertile = False
         self.fertilityFactorModifier = 0
@@ -178,7 +181,7 @@ class Agent:
         if self.diseaseProtectionChance == 10:
             return
         diseaseID = disease.ID
-        for currDisease in self.diseases:
+        for currDisease in self.symptomaticDiseases:
             currDiseaseID = currDisease["disease"].ID
             # If currently sick with this disease, do not contract it again
             if diseaseID == currDiseaseID:
@@ -198,21 +201,27 @@ class Agent:
                 return
         startIndex = diseaseInImmuneSystem["start"]
         endIndex = diseaseInImmuneSystem["end"]
-        caughtDisease = {"disease": disease, "startIndex": startIndex, "endIndex": endIndex}
+        caughtDisease = {"disease": disease, "startIndex": startIndex, "endIndex": endIndex, "startIncubation": self.timestep, "endIncubation": self.timestep + disease.incubationPeriod}
         if infector != None:
             caughtDisease["infector"] = infector
             if infector not in disease.infectors:
                 disease.infectors.append(infector.ID)
         disease.infected += 1
         self.diseaseProtectionChance += 1
+        if self.diseaseProtectionChance > 10:
+            self.diseaseProtectionChance = 10
         self.diseaseTransmissionChance += disease.transmissionChance
         if self.diseaseTransmissionChance > 10:
             self.diseaseTransmissionChance = 10
-        if self.diseaseProtectionChance > 10:
-            self.diseaseProtectionChance = 10
-        self.diseases.append(caughtDisease)
+        self.asymptomaticDiseases.append(caughtDisease)
         self.updateDiseaseEffects(disease)
         self.findCellsInRange()
+
+    def showSymptoms(self):
+        for disease in self.asymptomaticDiseases:
+            if self.timestep >= disease["endIncubation"]:
+                diseaseIndex = self.asymptomaticDiseases.index(disease)
+                self.symptomaticDiseases.append(self.asymptomaticDiseases.pop(diseaseIndex))
 
     def checkDiseaseImmunity(self, disease):
         hammingDistance = self.findNearestHammingDistanceInDisease(disease)["distance"]
@@ -265,7 +274,7 @@ class Agent:
     def doDeath(self, causeOfDeath):
         self.alive = False
         self.causeOfDeath = causeOfDeath
-        if len(self.diseases) > 0:
+        if self.isSick():
             self.diseaseDeath = True
         self.resetCell()
         self.doInheritance()
@@ -274,11 +283,12 @@ class Agent:
         self.socialNetwork = {"debtors": self.socialNetwork["debtors"], "children": self.socialNetwork["children"]}
         self.neighbors = []
         self.neighborhood = []
-        self.diseases = []
+        self.symptomaticDiseases = []
 
     def doDisease(self):
-        random.shuffle(self.diseases)
-        for diseaseRecord in self.diseases:
+        self.showSymptoms()
+        random.shuffle(self.symptomaticDiseases)
+        for diseaseRecord in self.symptomaticDiseases:
             diseaseTags = diseaseRecord["disease"].tags
             immuneResponseStart = diseaseRecord["startIndex"]
             immuneResponseEnd = min(diseaseRecord["endIndex"] + 1, len(self.immuneSystem))
@@ -288,10 +298,9 @@ class Agent:
                     self.immuneSystem[immuneResponseStart + i] = diseaseTags[i]
                     break
             if diseaseTags == immuneResponse:
-                self.diseases.remove(diseaseRecord)
+                self.symptomaticDiseases.remove(diseaseRecord)
                 self.updateDiseaseEffects(diseaseRecord["disease"])
-
-        diseaseCount = len(self.diseases)
+        diseaseCount = len(self.symptomaticDiseases)
         if diseaseCount == 0:
             return
         neighborCells = self.cell.neighbors.values()
@@ -302,7 +311,8 @@ class Agent:
                 neighbors.append(neighbor)
         random.shuffle(neighbors)
         for neighbor in neighbors:
-            neighbor.catchDisease(self.diseases[random.randrange(diseaseCount)]["disease"], self)
+            diseases = self.asymptomaticDiseases + self.symptomaticDiseases
+            neighbor.catchDisease(diseases[random.randrange(diseaseCount)]["disease"], self)
 
     def doInheritance(self):
         if self.inheritancePolicy == "none":
@@ -620,9 +630,9 @@ class Agent:
     def isPreyInfected(self, prey):
         if prey == None:
             return True
-        if len(prey.diseases) > 0 and len(self.diseases) == 0:
+        if len(prey.symptomaticDiseases) > 0 and len(self.symptomaticDiseases) == 0:
             return False
-        if len(self.diseases) > 0 and len(prey.diseases) == 0:
+        if len(self.symptomaticDiseases) > 0 and len(prey.symptomaticDiseases) == 0:
             return False
 
     def findBestCell(self):
@@ -1167,7 +1177,8 @@ class Agent:
         return False
 
     def isSick(self):
-        if len(self.diseases) > 0:
+        combinedDiseases = self.asymptomaticDiseases + self.symptomaticDiseases
+        if len(combinedDiseases) > 0:
             return True
         return False
 
@@ -1288,7 +1299,7 @@ class Agent:
     def updateDiseaseEffects(self, disease):
         # If disease not in list of diseases, agent has recovered and undo its effects
         recoveryCheck = -1
-        for diseaseRecord in self.diseases:
+        for diseaseRecord in self.symptomaticDiseases:
             if disease == diseaseRecord["disease"]:
                 recoveryCheck = 1
                 break
