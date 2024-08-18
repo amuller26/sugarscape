@@ -160,7 +160,7 @@ agentDepressionPercentage: float
     Default: 0.0
 
 agentDiseaseProtectionChance: [int, int]
-    Sets the initial chance an agent can get infected by another agent.
+    Sets the chance an agent can get infected by another agent.
     Note: a value of 0 mean no protection, while a value of 10 means complete protection
     Default: [0, 0]
 
@@ -306,6 +306,10 @@ diseaseFertilityPenalty: [float, float]
     Note: Negative values constitute a fertility decrease.
     Default: [0, 0]
 
+diseaseIncubationPeriod: [int, int]
+    Set the number of timesteps a disease can remain hidden while still infecting other agents.
+    Default: [0, 0]
+
 diseaseMovementPenalty: [int, int]
     Set the impact a disease will have on an agent's movement distance.
     Note: Negative values constitute a decrease in movement range.
@@ -320,7 +324,6 @@ diseaseStartTimeframe: [int, int]
     Set the timestep a disease can be initialized.
     Default: [0, 0]
 
-
 diseaseSugarMetabolismPenalty: [float, float]
     Set the impact a disease will have on an agent's sugar metabolism rate.
     Note: Negative values constitute a decrease in agent sugar metabolism.
@@ -329,6 +332,10 @@ diseaseSugarMetabolismPenalty: [float, float]
 diseaseTagStringLength: [int, int]
     Set the length of disease tags.
     The longer the length, the longer an agent will have the disease.
+    Default: [0, 0]
+
+diseaseTransmissionChance: [int, int]
+    Set the chance a disease can transmit between agents.
     Default: [0, 0]
 
 diseaseVisionPenalty: [int, int]
