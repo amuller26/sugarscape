@@ -1177,8 +1177,7 @@ class Agent:
         return False
 
     def isSick(self):
-        combinedDiseases = self.asymptomaticDiseases + self.symptomaticDiseases
-        if len(combinedDiseases) > 0:
+        if len(self.symptomaticDiseases) > 0:
             return True
         return False
 
