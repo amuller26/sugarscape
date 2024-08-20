@@ -753,6 +753,7 @@ class Agent:
         parentEndowments = {
         "aggressionFactor": [self.aggressionFactor, mate.aggressionFactor],
         "baseInterestRate": [self.baseInterestRate, mate.baseInterestRate],
+        "diseaseProtectionChance": [self.diseaseProtectionChance, mate.diseaseProtectionChance],
         "fertilityAge": [self.fertilityAge, mate.fertilityAge],
         "fertilityFactor": [self.fertilityFactor, mate.fertilityFactor],
         "infertilityAge": [self.infertilityAge, mate.infertilityAge],
