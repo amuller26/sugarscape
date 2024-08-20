@@ -969,8 +969,6 @@ class Sugarscape:
             agentDiseaseDeaths += 1 if agent.diseaseDeath == True else 0
             agentCombatDeaths += 1 if agent.causeOfDeath == "combat" else 0
             agentAgingDeaths += 1 if agent.causeOfDeath == "aging" else 0
-            #if agent.diseaseDeath == True:
-            #    agentDiseaseDeaths += 1
         meanAgeAtDeath = round(meanAgeAtDeath / numDeadAgents, 2) if numDeadAgents > 0 else 0
         self.deadAgents = []
 
