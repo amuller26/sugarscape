@@ -54,6 +54,7 @@ class Agent:
         self.alive = True
         self.age = 0
         self.aggressionFactorModifier = 0
+        self.asymptomaticDiseases = []
         self.causeOfDeath = None
         self.cellsInRange = []
         self.childEndowmentHashes = None
@@ -62,9 +63,9 @@ class Agent:
         self.diseaseTransmissionChance = 0
         self.diseases = []
         self.diseaseDeath = False
+        self.depressed = False
         self.symptomaticDiseases = []
         self.asymptomaticDiseases = []
-        self.diseaseTransmissionChance = 0
         self.familyHappiness = 0
         self.fertile = False
         self.fertilityFactorModifier = 0
@@ -91,6 +92,7 @@ class Agent:
         self.sugarMeanIncome = 1
         self.sugarMetabolismModifier = 0
         self.sugarPrice = 0
+        self.symptomaticDiseases = []
         self.tribe = self.findTribe()
         self.timestep = birthday
         self.tagZeroes = 0
@@ -163,6 +165,27 @@ class Agent:
                 "loanOrigin": timestep}
         self.socialNetwork["creditors"].append(loan)
 
+    def canCatchDisease(self, disease, infector):
+        if self.diseaseProtectionChance == 10:
+            return False
+        if self.checkDiseaseImmunity == True:
+            return False
+        if self.diseaseProtectionChance == 0 or infector == None:
+            return True
+        diseaseID = disease.ID
+        for currDisease in self.asymptomaticDiseases:
+            currDiseaseID = currDisease["disease"].ID
+            if diseaseID == currDiseaseID:
+                return False
+        for currDisease in self.symptomaticDiseases:
+            currDiseaseID = currDisease["disease"].ID
+            if diseaseID == currDiseaseID:
+                return False
+        randomTransmission = random.randint(1, 10)
+        randomProtection = random.randint(1, 10)
+        if randomTransmission > disease.transmissionChance and randomProtection <= self.diseaseProtectionChance:
+            return False
+
     def canReachCell(self, cell):
         if cell == self.cell or cell in self.cellsInRange:
             return True
@@ -178,27 +201,9 @@ class Agent:
             return False
 
     def catchDisease(self, disease, infector=None):
-        if self.diseaseProtectionChance == 10:
+        if self.canCatchDisease(disease, infector) == False:
             return
-        diseaseID = disease.ID
-        for currDisease in self.symptomaticDiseases:
-            currDiseaseID = currDisease["disease"].ID
-            # If currently sick with this disease, do not contract it again
-            if diseaseID == currDiseaseID:
-                return
         diseaseInImmuneSystem = self.findNearestHammingDistanceInDisease(disease)
-        hammingDistance = diseaseInImmuneSystem["distance"]
-        # If immune to disease, do not contract it
-        if hammingDistance == 0:
-            return
-        randomTransmissionRate = random.randint(1, 10)
-        if randomTransmissionRate > disease.transmissionChance:
-            return
-        # Random number determines if agent gets sick or not
-        if infector != None:
-            randomProtectionRate = random.randint(1,10)
-            if randomProtectionRate <= self.diseaseProtectionChance and self.diseaseProtectionChance > 0:
-                return
         startIndex = diseaseInImmuneSystem["start"]
         endIndex = diseaseInImmuneSystem["end"]
         caughtDisease = {"disease": disease, "startIndex": startIndex, "endIndex": endIndex, "startIncubation": self.timestep, "endIncubation": self.timestep + disease.incubationPeriod}
@@ -206,22 +211,16 @@ class Agent:
             caughtDisease["infector"] = infector
             if infector not in disease.infectors:
                 disease.infectors.append(infector.ID)
+        else:
+            self.startingDiseases += 1
+            disease.startingInfectedAgents += 1
         disease.infected += 1
         self.diseaseProtectionChance += 1
         if self.diseaseProtectionChance > 10:
             self.diseaseProtectionChance = 10
-        self.diseaseTransmissionChance += disease.transmissionChance
-        if self.diseaseTransmissionChance > 10:
-            self.diseaseTransmissionChance = 10
         self.asymptomaticDiseases.append(caughtDisease)
         self.updateDiseaseEffects(disease)
         self.findCellsInRange()
-
-    def showSymptoms(self):
-        for disease in self.asymptomaticDiseases:
-            if self.timestep >= disease["endIncubation"]:
-                diseaseIndex = self.asymptomaticDiseases.index(disease)
-                self.symptomaticDiseases.append(self.asymptomaticDiseases.pop(diseaseIndex))
 
     def checkDiseaseImmunity(self, disease):
         hammingDistance = self.findNearestHammingDistanceInDisease(disease)["distance"]
@@ -1279,6 +1278,12 @@ class Agent:
             self.addAgentToSocialNetwork(mother)
         self.socialNetwork["mother"] = mother
 
+    def showSymptoms(self):
+        for disease in self.asymptomaticDiseases:
+            if self.timestep >= disease["endIncubation"]:
+                diseaseIndex = self.asymptomaticDiseases.index(disease)
+                self.symptomaticDiseases.append(self.asymptomaticDiseases.pop(diseaseIndex))
+
     def spawnChild(self, childID, birthday, cell, configuration):
         return Agent(childID, birthday, cell, configuration)
 
@@ -1302,20 +1307,19 @@ class Agent:
             if disease == diseaseRecord["disease"]:
                 recoveryCheck = 1
                 break
-
-        sugarMetabolismPenalty = disease.sugarMetabolismPenalty * recoveryCheck
-        spiceMetabolismPenalty = disease.spiceMetabolismPenalty * recoveryCheck
-        visionPenalty = disease.visionPenalty * recoveryCheck
-        movementPenalty = disease.movementPenalty * recoveryCheck
-        fertilityPenalty = disease.fertilityPenalty * recoveryCheck
         aggressionPenalty = disease.aggressionPenalty * recoveryCheck
+        fertilityPenalty = disease.fertilityPenalty * recoveryCheck
+        movementPenalty = disease.movementPenalty * recoveryCheck
+        spiceMetabolismPenalty = disease.spiceMetabolismPenalty * recoveryCheck
+        sugarMetabolismPenalty = disease.sugarMetabolismPenalty * recoveryCheck
+        visionPenalty = disease.visionPenalty * recoveryCheck
 
-        self.sugarMetabolismModifier += sugarMetabolismPenalty
-        self.spiceMetabolismModifier += spiceMetabolismPenalty
-        self.visionModifier += visionPenalty
-        self.movementModifier += movementPenalty
-        self.fertilityFactorModifier += fertilityPenalty
         self.aggressionFactorModifier += aggressionPenalty
+        self.fertilityFactorModifier += fertilityPenalty
+        self.movementModifier += movementPenalty
+        self.spiceMetabolismModifier += spiceMetabolismPenalty
+        self.sugarMetabolismModifier += sugarMetabolismPenalty
+        self.visionModifier += visionPenalty
 
     def updateFriends(self, neighbor):
         neighborID = neighbor.ID
