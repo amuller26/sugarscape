@@ -61,11 +61,8 @@ class Agent:
         self.conflictHappiness = 0
         self.depressed = False
         self.diseaseTransmissionChance = 0
-        self.diseases = []
         self.diseaseDeath = False
         self.depressed = False
-        self.symptomaticDiseases = []
-        self.asymptomaticDiseases = []
         self.familyHappiness = 0
         self.fertile = False
         self.fertilityFactorModifier = 0
