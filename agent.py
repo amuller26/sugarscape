@@ -170,11 +170,8 @@ class Agent:
         if self.diseaseProtectionChance == 0 or infector == None:
             return True
         diseaseID = disease.ID
-        for currDisease in self.asymptomaticDiseases:
-            currDiseaseID = currDisease["disease"].ID
-            if diseaseID == currDiseaseID:
-                return False
-        for currDisease in self.symptomaticDiseases:
+        combinedDiseases = self.asymptomaticDiseases + self.symptomaticDiseases
+        for currDisease in combinedDiseases:
             currDiseaseID = currDisease["disease"].ID
             if diseaseID == currDiseaseID:
                 return False
