@@ -213,7 +213,6 @@ class Agent:
         if self.diseaseProtectionChance > 10:
             self.diseaseProtectionChance = 10
         self.asymptomaticDiseases.append(caughtDisease)
-        self.updateDiseaseEffects(disease)
         self.findCellsInRange()
 
     def checkDiseaseImmunity(self, disease):
@@ -1278,6 +1277,7 @@ class Agent:
             if self.timestep >= disease["endIncubation"]:
                 diseaseIndex = self.asymptomaticDiseases.index(disease)
                 self.symptomaticDiseases.append(self.asymptomaticDiseases.pop(diseaseIndex))
+                self.updateDiseaseEffects(disease["disease"])
 
     def spawnChild(self, childID, birthday, cell, configuration):
         return Agent(childID, birthday, cell, configuration)
