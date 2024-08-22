@@ -54,7 +54,6 @@ class Agent:
         self.alive = True
         self.age = 0
         self.aggressionFactorModifier = 0
-        self.asymptomaticDiseases = []
         self.causeOfDeath = None
         self.cellsInRange = []
         self.childEndowmentHashes = None
@@ -68,6 +67,7 @@ class Agent:
         self.fertilityFactorModifier = 0
         self.happiness = 0
         self.healthHappiness = 0
+        self.incubatingDiseases = []
         self.lastDoneCombat = -1
         self.lastMoved = -1
         self.lastReproduced = -1
@@ -162,23 +162,25 @@ class Agent:
                 "loanOrigin": timestep}
         self.socialNetwork["creditors"].append(loan)
 
-    def canCatchDisease(self, disease, infector):
+    def canCatchDisease(self, disease, infector=None):
         if self.diseaseProtectionChance == 10:
             return False
-        if self.checkDiseaseImmunity == True:
+        if self.checkDiseaseImmunity(disease) == True:
             return False
         if self.diseaseProtectionChance == 0 or infector == None:
             return True
         diseaseID = disease.ID
-        combinedDiseases = self.asymptomaticDiseases + self.symptomaticDiseases
+        combinedDiseases = self.incubatingDiseases + self.symptomaticDiseases
         for currDisease in combinedDiseases:
             currDiseaseID = currDisease["disease"].ID
             if diseaseID == currDiseaseID:
                 return False
+        # TODO: need to change protection and transmission to 0->1 use random.random()
         randomTransmission = random.randint(1, 10)
         randomProtection = random.randint(1, 10)
         if randomTransmission > disease.transmissionChance and randomProtection <= self.diseaseProtectionChance:
             return False
+        return True
 
     def canReachCell(self, cell):
         if cell == self.cell or cell in self.cellsInRange:
@@ -195,25 +197,24 @@ class Agent:
             return False
 
     def catchDisease(self, disease, infector=None):
-        if self.canCatchDisease(disease, infector) == False:
-            return
-        diseaseInImmuneSystem = self.findNearestHammingDistanceInDisease(disease)
-        startIndex = diseaseInImmuneSystem["start"]
-        endIndex = diseaseInImmuneSystem["end"]
-        caughtDisease = {"disease": disease, "startIndex": startIndex, "endIndex": endIndex, "startIncubation": self.timestep, "endIncubation": self.timestep + disease.incubationPeriod}
-        if infector != None:
-            caughtDisease["infector"] = infector
-            if infector not in disease.infectors:
-                disease.infectors.append(infector.ID)
-        else:
-            self.startingDiseases += 1
-            disease.startingInfectedAgents += 1
-        disease.infected += 1
-        self.diseaseProtectionChance += 1
-        if self.diseaseProtectionChance > 10:
-            self.diseaseProtectionChance = 10
-        self.asymptomaticDiseases.append(caughtDisease)
-        self.findCellsInRange()
+        if self.canCatchDisease(disease, infector) == True:
+            diseaseInImmuneSystem = self.findNearestHammingDistanceInDisease(disease)
+            startIndex = diseaseInImmuneSystem["start"]
+            endIndex = diseaseInImmuneSystem["end"]
+            caughtDisease = {"disease": disease, "startIndex": startIndex, "endIndex": endIndex, "startIncubation": self.timestep, "endIncubation": self.timestep + disease.incubationPeriod}
+            if infector != None:
+                caughtDisease["infector"] = infector
+                disease.infectors.add(infector.ID)
+            else:
+                self.startingDiseases += 1
+                disease.startingInfectedAgents += 1
+            disease.infected += 1
+            self.diseaseProtectionChance += 1
+            if self.diseaseProtectionChance > 10:
+                self.diseaseProtectionChance = 10
+            self.incubatingDiseases.append(caughtDisease)
+            self.showSymptoms()
+            self.findCellsInRange()
 
     def checkDiseaseImmunity(self, disease):
         hammingDistance = self.findNearestHammingDistanceInDisease(disease)["distance"]
@@ -303,7 +304,7 @@ class Agent:
                 neighbors.append(neighbor)
         random.shuffle(neighbors)
         for neighbor in neighbors:
-            diseases = self.asymptomaticDiseases + self.symptomaticDiseases
+            diseases = self.incubatingDiseases + self.symptomaticDiseases
             neighbor.catchDisease(diseases[random.randrange(diseaseCount)]["disease"], self)
 
     def doInheritance(self):
@@ -621,11 +622,11 @@ class Agent:
 
     def isPreyInfected(self, prey):
         if prey == None:
-            return True
+            return False
         if len(prey.symptomaticDiseases) > 0 and len(self.symptomaticDiseases) == 0:
-            return False
+            return True
         if len(self.symptomaticDiseases) > 0 and len(prey.symptomaticDiseases) == 0:
-            return False
+            return True
 
     def findBestCell(self):
         self.findNeighborhood()
@@ -648,7 +649,7 @@ class Agent:
             prey = cell.agent
             if cell.isOccupied() and self.isNeighborValidPrey(prey) == False:
                 continue
-            if self.isPreyInfected(prey) == False:
+            if self.isPreyInfected(prey) == True:
                 continue
             preyTribe = prey.tribe if prey != None else "empty"
             preySugar = prey.sugar if prey != None else 0
@@ -1273,10 +1274,10 @@ class Agent:
         self.socialNetwork["mother"] = mother
 
     def showSymptoms(self):
-        for disease in self.asymptomaticDiseases:
+        for disease in self.incubatingDiseases:
             if self.timestep >= disease["endIncubation"]:
-                diseaseIndex = self.asymptomaticDiseases.index(disease)
-                self.symptomaticDiseases.append(self.asymptomaticDiseases.pop(diseaseIndex))
+                diseaseIndex = self.incubatingDiseases.index(disease)
+                self.symptomaticDiseases.append(self.incubatingDiseases.pop(diseaseIndex))
                 self.updateDiseaseEffects(disease["disease"])
 
     def spawnChild(self, childID, birthday, cell, configuration):

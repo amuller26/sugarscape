@@ -584,7 +584,7 @@ class GUI:
         elif self.activeColorOptions["agent"] == "Depression":
             return self.colors["sick"] if agent.depressed == True else self.colors["healthy"]
         elif self.activeColorOptions["agent"] == "Disease":
-            return self.colors["sick"] if len(agent.symptomaticDiseases) > 0 else self.colors["healthy"]
+            return self.colors["sick"] if agent.isSick() else self.colors["healthy"]
         elif self.activeColorOptions["agent"] == "Metabolism":
             return self.colors["metabolism"][agent.sugarMetabolism + agent.spiceMetabolism]
         elif self.activeColorOptions["agent"] == "Movement":
