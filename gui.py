@@ -115,7 +115,7 @@ class GUI:
 
         statsLabel = tkinter.Label(window, text="Timestep: - | Population: - | Metabolism: - | Movement: - | Vision: - | Gini: - | Trade Price: - | Trade Volume: -", font="Roboto 10", justify=tkinter.CENTER)
         statsLabel.grid(row=1, column=0, columnspan=self.menuTrayColumns, sticky="nsew")
-        cellLabel = tkinter.Label(window, text="Cell: - | Sugar: - | Spice: - | Pollution: - | Season: -\nAgent: - | Age: - | Vision: - | Movement: - | Sugar: - | Spice: - | Metabolism: - | Decision Model: -", font="Roboto 10", justify=tkinter.CENTER)
+        cellLabel = tkinter.Label(window, text="Cell: - | Sugar: - | Spice: - | Pollution: - | Season: -\nAgent: - | Age: - | Vision: - | Movement: - | Sugar: - | Spice: - | Metabolism: - | Decision Model: - | Diseases: -", font="Roboto 10", justify=tkinter.CENTER)
         cellLabel.grid(row=2, column=0, columnspan=self.menuTrayColumns, sticky="nsew")
 
         self.widgets["playButton"] = playButton
