@@ -86,6 +86,7 @@
         "environmentUniversalSugarIncomeInterval": 0,
         "environmentWidth": 50,
         "environmentWraparound": true,
+        "experimentalGroup": null,
         "headlessMode": false,
         "interfaceHeight": 1000,
         "interfaceWidth": 900,
