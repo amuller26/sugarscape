@@ -276,6 +276,10 @@ class Agent:
 
     def doDisease(self):
         self.showSymptoms()
+        if self.age >= self.infertilityAge:
+            self.diseaseProtectionChance = round(self.diseaseProtectionChance - 0.01, 2)
+            if self.diseaseProtectionChance < 0:
+                self.diseaseProtectionChance = 0
         random.shuffle(self.symptomaticDiseases)
         for diseaseRecord in self.symptomaticDiseases:
             diseaseTags = diseaseRecord["disease"].tags
