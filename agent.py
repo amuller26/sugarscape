@@ -112,6 +112,13 @@ class Agent:
             # Depressed agents have a smaller friend network due to social withdrawal
             self.maxFriends = math.ceil(self.maxFriends - (self.maxFriends * 0.3667))
 
+    def addAgentToSocialNetwork(self, agent):
+        agentID = agent.ID
+        if agentID in self.socialNetwork:
+            return
+        self.socialNetwork[agentID] = {"agent": agent, "lastSeen": self.lastMoved, "timesVisited": 1, "timesReproduced": 0,
+                                         "timesTraded": 0, "timesLoaned": 0, "marginalRateOfSubstitution": 0}
+
     def addChildToCell(self, mate, cell, childConfiguration):
         sugarscape = self.cell.environment.sugarscape
         childID = sugarscape.generateAgentID()
@@ -131,13 +138,6 @@ class Agent:
             child.setFather(self)
             child.setMother(mate)
         return child
-
-    def addAgentToSocialNetwork(self, agent):
-        agentID = agent.ID
-        if agentID in self.socialNetwork:
-            return
-        self.socialNetwork[agentID] = {"agent": agent, "lastSeen": self.lastMoved, "timesVisited": 1, "timesReproduced": 0,
-                                         "timesTraded": 0, "timesLoaned": 0, "marginalRateOfSubstitution": 0}
 
     def addLoanToAgent(self, agent, timestep, sugarPrincipal, sugarLoan, spicePrincipal, spiceLoan, duration):
         agentID = agent.ID
@@ -218,6 +218,26 @@ class Agent:
             return True
         else:
             return False
+
+    def checkInfectedArea(self, targetCell):
+        infectedAgentArea = False
+        checkAgents = targetCell.findNeighborAgents()
+        if targetCell.isOccupied() == True:
+            checkAgents.append(targetCell.agent)
+        for agent in checkAgents:
+            if agent.isSick() == True:
+                infectedAgentArea = True
+        return infectedAgentArea
+
+    def checkTribeArea(self, targetCell):
+        sameTribe = False
+        checkAgents = targetCell.findNeighborAgents()
+        if targetCell.isOccupied() == True:
+            checkAgents.append(targetCell.agent)
+        for agent in checkAgents:
+            if self.tribe == agent.tribe:
+                sameTribe = True
+        return sameTribe
 
     def collectResourcesAtCell(self):
         sugarCollected = self.cell.sugar
@@ -305,12 +325,6 @@ class Agent:
         for neighbor in neighbors:
             diseases = self.incubatingDiseases + self.symptomaticDiseases
             neighbor.catchDisease(diseases[random.randrange(diseaseCount)]["disease"], self)
-
-    def recoverFromDisease(self, disease):
-        index = self.symptomaticDiseases.index(disease)
-        recoveredDisease = self.symptomaticDiseases.pop(index)
-        self.recoveredDiseases.append(recoveredDisease)
-        self.updateDiseaseEffects(recoveredDisease["disease"])
 
     def doInheritance(self):
         if self.inheritancePolicy == "none":
@@ -654,7 +668,9 @@ class Agent:
             prey = cell.agent
             if cell.isOccupied() and self.isNeighborValidPrey(prey) == False:
                 continue
-            if self.isPreyInfected(prey) == True:
+            if self.isSick() == False and self.checkInfectedArea(cell) == True:
+                continue
+            if self.isSick() == True and self.checkTribeArea(cell) == True:
                 continue
             preyTribe = prey.tribe if prey != None else "empty"
             preySugar = prey.sugar if prey != None else 0
@@ -1255,6 +1271,12 @@ class Agent:
             cellString = f"({cell['cell'].x},{cell['cell'].y}) [{cell['wealth']},{cell['range']}]"
             print(f"Ethical cell {i + 1}/{len(cells)}: {cellString}")
             i += 1
+
+    def recoverFromDisease(self, disease):
+        index = self.symptomaticDiseases.index(disease)
+        recoveredDisease = self.symptomaticDiseases.pop(index)
+        self.recoveredDiseases.append(recoveredDisease)
+        self.updateDiseaseEffects(recoveredDisease["disease"])
 
     def removeDebt(self, loan):
         for debtor in self.socialNetwork["debtors"]:
