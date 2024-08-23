@@ -64,12 +64,12 @@ class Sugarscape:
                              "totalMetabolismCost": 0, "agentsReplaced": 0, "agentsBorn": 0, "agentStarvationDeaths": 0, "agentDiseaseDeaths": 0, "environmentWealthCreated": 0,
                              "agentWealthTotal": 0, "environmentWealthTotal": 0, "agentWealthCollected": 0, "agentWealthBurnRate": 0, "agentMeanTimeToLive": 0,
                              "agentTotalMetabolism": 0, "agentCombatDeaths": 0, "agentAgingDeaths": 0, "totalSickAgents": 0}
-        self.diseaseStats = {}
+        diseaseStats = {}
         for disease in self.diseases:
-            self.diseaseStats[f"disease{disease.ID}Incidence"] = 0
-            self.diseaseStats[f"disease{disease.ID}Prevalence"] = 0
-            self.diseaseStats[f"disease{disease.ID}RValue"] = 0.0
-        self.runtimeStats.update(self.diseaseStats)
+            diseaseStats[f"disease{disease.ID}Incidence"] = 0
+            diseaseStats[f"disease{disease.ID}Prevalence"] = 0
+            diseaseStats[f"disease{disease.ID}RValue"] = 0.0
+        self.runtimeStats.update(diseaseStats)
         self.graphStats = {"ageBins": [], "sugarBins": [], "spiceBins": [], "lorenzCurvePoints": [], "meanTribeTags": [],
                            "maxSugar": 0, "maxSpice": 0, "maxWealth": 0}
         self.log = open(configuration["logfile"], 'a') if configuration["logfile"] != None else None
@@ -252,11 +252,11 @@ class Sugarscape:
         if "all" in self.debug or "sugarscape" in self.debug:
             print(f"Timestep: {self.timestep}\nLiving Agents: {len(self.agents)}")
         self.timestep += 1
-        self.infectAgents()
         if self.end == True or (len(self.agents) == 0 and self.keepAlive == False):
             self.toggleEnd()
         else:
             self.environment.doTimestep(self.timestep)
+            self.infectAgents()
             random.shuffle(self.agents)
             for agent in self.agents:
                 agent.doTimestep(self.timestep)
@@ -358,16 +358,6 @@ class Sugarscape:
         random.shuffle(tags)
         return tags
 
-    def groupDiseases(self):
-        groupedDiseases = {}
-        for timestep in self.diseasesStats:
-            disease = timestep["disease"]
-            if disease not in groupedDiseases:
-                groupedDiseases[disease] = []
-            del timestep["disease"]
-            groupedDiseases[disease].append(timestep)
-        return groupedDiseases
-
     def endSimulation(self):
         self.removeDeadAgents()
         self.endLog()
@@ -460,7 +450,8 @@ class Sugarscape:
             currStartTimestep += 1
             currSugarMetabolismPenalty += 1
             currTagLength += 1
-            currTransmissionChance += 1
+            # To make sure the disease's transmissionChance is a properly-formatted decimal
+            currTransmissionChance = round(currTransmissionChance + (10 ** -1), 1)
             currVisionPenalty += 1
 
             if currAggressionPenalty > maxAggressionPenalty:
@@ -1011,18 +1002,16 @@ class Sugarscape:
         self.runtimeStats["totalSickAgents"] = totalSickAgents
 
         for disease in self.diseases:
-            immuneAgents = 0
-            if numAgents > 0:
-                for agent in self.agents:
-                    agentImmunity = agent.checkDiseaseImmunity(disease)
-                    if agentImmunity == True:
-                        immuneAgents += 1
-            infectors = len(disease.infectors)
-            incidence = disease.infected
-            prevalence = self.countInfectedAgents(disease)
+            incidence = 0
+            prevalence = 0
             r = 0.0
-            if infectors > 0:
-                r = round(float(incidence / infectors), 2)
+            if numAgents > 0:
+                infectors = len(disease.infectors)
+                incidence = disease.infected
+                prevalence = self.countInfectedAgents(disease)
+                r = 0.0
+                if infectors > 0:
+                    r = round(float(incidence / infectors), 2)
             self.runtimeStats[f"disease{disease.ID}Incidence"] = incidence
             self.runtimeStats[f"disease{disease.ID}Prevalence"] = prevalence
             self.runtimeStats[f"disease{disease.ID}RValue"] = r
@@ -1162,10 +1151,14 @@ def verifyConfiguration(configuration):
             print(f"Cannot have agent maximum tribal factor of {configuration['agentDecisionModelTribalFactor'][1]}. Setting agent maximum tribal factor to 1.0.")
         configuration["agentDecisionModelTribalFactor"][1] = 1
 
-    if configuration["agentDiseaseProtectionChance"][1] > 10:
+    if configuration["agentDiseaseProtectionChance"][0] < 0:
         if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
-            print(f"Cannot have agent maximum disease protection chance of {configuration['agentDiseaseProtectionChance'][1]}. Setting agent maximum disease protection chance to 10.")
-        configuration["agentDiseaseProtectionChance"][1] = 10
+            print(f"Cannot have agent minimum disease protection chance of {configuration['agentDiseaseProtectionChance'][0]}. Setting agent minimum disease protection chance to 0.0.")
+        configuration["agentDiseaseProtectionChance"][0] = 0.0
+    if configuration["agentDiseaseProtectionChance"][1] > 1:
+        if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+            print(f"Cannot have agent maximum disease protection chance of {configuration['agentDiseaseProtectionChance'][1]}. Setting agent maximum disease protection chance to 1.0.")
+        configuration["agentDiseaseProtectionChance"][1] = 1.0
 
     if configuration["agentTagStringLength"] < 0:
         if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
@@ -1181,6 +1174,15 @@ def verifyConfiguration(configuration):
         if "all" in configuration["debugMode"] or "environment" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
             print(f"Cannot have a longer agent tag string length than maximum number of tribes. Setting the number of tribes to {configuration['agentTagStringLength']}.")
         configuration["environmentMaxTribes"] = configuration["agentTagStringLength"]
+
+    if configuration["diseaseTransmissionChance"][0] < 0.0:
+        if "all" in configuration["debugMode"] or "disease" in configuration["debugMode"]:
+            print(f"Cannot have a minimum disease transmission chance of {configuration['diseaseTransmissionChance'][0]}. Setting disease transmission chance to 0.0.")
+        configuration["diseaseTransmissionChance"][0] = 0.0
+    if configuration["diseaseTransmissionChance"][1] > 1.0:
+        if "all" in configuration["debugMode"] or "disease" in configuration["debugMode"]:
+            print(f"Cannot have a maximum disease transmission chance of {configuration['diseaseTransmissionChance'][1]}. Setting disease transmission chance to 1.0.")
+        configuration["diseaseTransmissionChance"][1] = 1.0
 
     # Ensure at most number of tribes and decision models are equal to the number of colors in the GUI
     maxColors = 25
@@ -1298,7 +1300,7 @@ if __name__ == "__main__":
                      "agentDecisionModelLookaheadFactor": [0],
                      "agentDecisionModelTribalFactor": [-1, -1],
                      "agentDepressionPercentage": 0,
-                     "agentDiseaseProtectionChance": [0, 0],
+                     "agentDiseaseProtectionChance": [0.0, 0.0],
                      "agentFemaleInfertilityAge": [0, 0],
                      "agentFemaleFertilityAge": [0, 0],
                      "agentFertilityFactor": [0, 0],
@@ -1337,7 +1339,7 @@ if __name__ == "__main__":
                      "diseaseStartTimeframe": [0, 0],
                      "diseaseSugarMetabolismPenalty": [0, 0],
                      "diseaseTagStringLength": [0, 0],
-                     "diseaseTransmissionChance": [0, 0],
+                     "diseaseTransmissionChance": [0.0, 0.0],
                      "diseaseVisionPenalty": [0, 0],
                      "environmentEquator": -1,
                      "environmentHeight": 50,

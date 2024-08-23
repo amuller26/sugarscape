@@ -59,7 +59,6 @@ class Agent:
         self.childEndowmentHashes = None
         self.conflictHappiness = 0
         self.depressed = False
-        self.diseaseTransmissionChance = 0
         self.diseaseDeath = False
         self.depressed = False
         self.familyHappiness = 0
@@ -80,6 +79,7 @@ class Agent:
         self.neighborhood = []
         self.neighbors = []
         self.nice = 0
+        self.recoveredDiseases = []
         self.socialHappiness = 0
         self.socialNetwork = {"father": None, "mother": None, "children": [], "friends": [], "creditors": [], "debtors": [], "mates": []}
         self.spiceMeanIncome = 1
@@ -163,7 +163,7 @@ class Agent:
         self.socialNetwork["creditors"].append(loan)
 
     def canCatchDisease(self, disease, infector=None):
-        if self.diseaseProtectionChance == 10:
+        if self.diseaseProtectionChance == 1:
             return False
         if self.checkDiseaseImmunity(disease) == True:
             return False
@@ -175,9 +175,8 @@ class Agent:
             currDiseaseID = currDisease["disease"].ID
             if diseaseID == currDiseaseID:
                 return False
-        # TODO: need to change protection and transmission to 0->1 use random.random()
-        randomTransmission = random.randint(1, 10)
-        randomProtection = random.randint(1, 10)
+        randomTransmission = random.random()
+        randomProtection = random.random()
         if randomTransmission > disease.transmissionChance and randomProtection <= self.diseaseProtectionChance:
             return False
         return True
@@ -209,9 +208,6 @@ class Agent:
                 self.startingDiseases += 1
                 disease.startingInfectedAgents += 1
             disease.infected += 1
-            self.diseaseProtectionChance += 1
-            if self.diseaseProtectionChance > 10:
-                self.diseaseProtectionChance = 10
             self.incubatingDiseases.append(caughtDisease)
             self.showSymptoms()
             self.findCellsInRange()
@@ -291,8 +287,7 @@ class Agent:
                     self.immuneSystem[immuneResponseStart + i] = diseaseTags[i]
                     break
             if diseaseTags == immuneResponse:
-                self.symptomaticDiseases.remove(diseaseRecord)
-                self.updateDiseaseEffects(diseaseRecord["disease"])
+                self.recoverFromDisease(diseaseRecord)
         diseaseCount = len(self.symptomaticDiseases)
         if diseaseCount == 0:
             return
@@ -306,6 +301,12 @@ class Agent:
         for neighbor in neighbors:
             diseases = self.incubatingDiseases + self.symptomaticDiseases
             neighbor.catchDisease(diseases[random.randrange(diseaseCount)]["disease"], self)
+
+    def recoverFromDisease(self, disease):
+        index = self.symptomaticDiseases.index(disease)
+        recoveredDisease = self.symptomaticDiseases.pop(index)
+        self.recoveredDiseases.append(recoveredDisease)
+        self.updateDiseaseEffects(recoveredDisease["disease"])
 
     def doInheritance(self):
         if self.inheritancePolicy == "none":
