@@ -83,7 +83,7 @@ class Sugarscape:
                 experimentalGroupKey = self.experimentalGroup + key[0].upper() + key[1:]
                 groupRuntimeStats[controlGroupKey] = 0
                 groupRuntimeStats[experimentalGroupKey] = 0
-        self.runtimeStats.update(groupRuntimeStats)
+            self.runtimeStats.update(groupRuntimeStats)
 
     def addAgent(self, agent):
         self.bornAgents.append(agent)
@@ -1328,7 +1328,7 @@ if __name__ == "__main__":
                      "agentDecisionModelLookaheadFactor": [0],
                      "agentDecisionModelTribalFactor": [-1, -1],
                      "agentDepressionPercentage": 0,
-                     "agentDiseaseProtectionChance": [0.0, 0.0],
+                     "agentDiseaseProtectionChance": [0.0, 1.0],
                      "agentFemaleInfertilityAge": [0, 0],
                      "agentFemaleFertilityAge": [0, 0],
                      "agentFertilityFactor": [0, 0],
@@ -1367,7 +1367,7 @@ if __name__ == "__main__":
                      "diseaseStartTimeframe": [0, 0],
                      "diseaseSugarMetabolismPenalty": [0, 0],
                      "diseaseTagStringLength": [0, 0],
-                     "diseaseTransmissionChance": [0.0, 0.0],
+                     "diseaseTransmissionChance": [0.0, 1.0],
                      "diseaseVisionPenalty": [0, 0],
                      "environmentEquator": -1,
                      "environmentHeight": 50,

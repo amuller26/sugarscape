@@ -225,6 +225,8 @@ class Agent:
         if targetCell.isOccupied() == True:
             checkAgents.append(targetCell.agent)
         for agent in checkAgents:
+            if agent == self:
+                continue
             if agent.isSick() == True:
                 infectedAgentArea = True
         return infectedAgentArea
@@ -235,6 +237,8 @@ class Agent:
         if targetCell.isOccupied() == True:
             checkAgents.append(targetCell.agent)
         for agent in checkAgents:
+            if agent == self:
+                continue
             if self.tribe == agent.tribe:
                 sameTribe = True
         return sameTribe
