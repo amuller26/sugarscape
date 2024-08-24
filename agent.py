@@ -153,6 +153,25 @@ class Agent:
         agent.sugar = agent.sugar + sugarPrincipal
         agent.spice = agent.spice + spicePrincipal
 
+    def canCatchDisease(self, disease, infector=None):
+        if self.diseaseProtectionChance == 1:
+            return False
+        if self.checkDiseaseImmunity(disease) == True:
+            return False
+        if self.diseaseProtectionChance == 0 or infector == None:
+            return True
+        diseaseID = disease.ID
+        combinedDiseases = self.incubatingDiseases + self.symptomaticDiseases
+        for currDisease in combinedDiseases:
+            currDiseaseID = currDisease["disease"].ID
+            if diseaseID == currDiseaseID:
+                return False
+        randomTransmission = random.random()
+        randomProtection = random.random()
+        if randomTransmission > disease.transmissionChance and randomProtection <= self.diseaseProtectionChance:
+            return False
+        return True
+
     def canReachCell(self, cell):
         if cell == self.cell or cell in self.cellsInRange:
             return True
