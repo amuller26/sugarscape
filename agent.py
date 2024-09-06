@@ -112,6 +112,15 @@ class Agent:
             # Depressed agents have a smaller friend network due to social withdrawal
             self.maxFriends = math.ceil(self.maxFriends - (self.maxFriends * 0.3667))
 
+    def addLoanFromAgent(self, agent, timestep, sugarLoan, spiceLoan, duration):
+        agentID = agent.ID
+        if agentID not in self.socialNetwork:
+            self.addAgentToSocialNetwork(agent)
+        self.socialNetwork[agentID]["timesLoaned"] += 1
+        loan = {"creditor": agentID, "debtor": self.ID, "sugarLoan": sugarLoan, "spiceLoan": spiceLoan, "loanDuration": duration,
+                "loanOrigin": timestep}
+        self.socialNetwork["creditors"].append(loan)
+
     def addAgentToSocialNetwork(self, agent):
         agentID = agent.ID
         if agentID in self.socialNetwork:
