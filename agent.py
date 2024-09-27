@@ -670,12 +670,14 @@ class Agent:
         for cell, travelDistance in cellsInRange:
             # Avoid attacking agents ineligible to attack
             prey = cell.agent
+            """
             if cell.isOccupied() and self.isNeighborValidPrey(prey) == False:
                 continue
             if self.isSick() == False and self.checkInfectedArea(cell) == True:
                 continue
             if self.isSick() == True and self.checkTribeArea(cell) == True:
                 continue
+            """
             preyTribe = prey.tribe if prey != None else "empty"
             preySugar = prey.sugar if prey != None else 0
             preySpice = prey.spice if prey != None else 0
