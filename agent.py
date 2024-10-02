@@ -79,7 +79,6 @@ class Agent:
         self.neighborhood = []
         self.neighbors = []
         self.nice = 0
-        self.recoveredDiseases = []
         self.socialHappiness = 0
         self.socialNetwork = {"father": None, "mother": None, "children": [], "friends": [], "creditors": [], "debtors": [], "mates": []}
         self.spiceMeanIncome = 1
@@ -218,30 +217,6 @@ class Agent:
             return True
         else:
             return False
-
-    def checkInfectedArea(self, targetCell):
-        infectedAgentArea = False
-        checkAgents = targetCell.findNeighborAgents()
-        if targetCell.isOccupied() == True:
-            checkAgents.append(targetCell.agent)
-        for agent in checkAgents:
-            if agent == self:
-                continue
-            if agent.isSick() == True:
-                infectedAgentArea = True
-        return infectedAgentArea
-
-    def checkTribeArea(self, targetCell):
-        sameTribe = False
-        checkAgents = targetCell.findNeighborAgents()
-        if targetCell.isOccupied() == True:
-            checkAgents.append(targetCell.agent)
-        for agent in checkAgents:
-            if agent == self:
-                continue
-            if self.tribe == agent.tribe:
-                sameTribe = True
-        return sameTribe
 
     def collectResourcesAtCell(self):
         sugarCollected = self.cell.sugar
@@ -670,14 +645,9 @@ class Agent:
         for cell, travelDistance in cellsInRange:
             # Avoid attacking agents ineligible to attack
             prey = cell.agent
-            """
             if cell.isOccupied() and self.isNeighborValidPrey(prey) == False:
                 continue
-            if self.isSick() == False and self.checkInfectedArea(cell) == True:
-                continue
-            if self.isSick() == True and self.checkTribeArea(cell) == True:
-                continue
-            """
+
             preyTribe = prey.tribe if prey != None else "empty"
             preySugar = prey.sugar if prey != None else 0
             preySpice = prey.spice if prey != None else 0
@@ -1305,7 +1275,6 @@ class Agent:
     def recoverFromDisease(self, disease):
         index = self.symptomaticDiseases.index(disease)
         recoveredDisease = self.symptomaticDiseases.pop(index)
-        self.recoveredDiseases.append(recoveredDisease)
         self.updateDiseaseEffects(recoveredDisease["disease"])
 
     def removeDebt(self, loan):
