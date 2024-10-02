@@ -255,7 +255,8 @@ class Sugarscape:
     def countInfectedAgents(self, disease):
         totalInfected = 0
         for agent in self.agents:
-            for agentDisease in agent.symptomaticDiseases:
+            combinedDiseases = agent.incubatingDiseases + agent.symptomaticDiseases
+            for agentDisease in combinedDiseases:
                 if disease == agentDisease["disease"]:
                     totalInfected += 1
         return totalInfected
