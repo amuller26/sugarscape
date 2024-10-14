@@ -618,14 +618,6 @@ class Agent:
     def findAggression(self):
         return max(0, self.aggressionFactor + self.aggressionFactorModifier)
 
-    def isPreyInfected(self, prey):
-        if prey == None:
-            return False
-        if len(prey.symptomaticDiseases) > 0 and len(self.symptomaticDiseases) == 0:
-            return True
-        if len(self.symptomaticDiseases) > 0 and len(prey.symptomaticDiseases) == 0:
-            return True
-
     def findBestCell(self):
         self.findNeighborhood()
         if len(self.cellsInRange) == 0:
